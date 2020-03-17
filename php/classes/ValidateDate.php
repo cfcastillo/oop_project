@@ -1,5 +1,5 @@
 <?php
-namespace Deepdivedylan\DataDesign;
+namespace cfiniello\ObjectOrientedDesign;
 /**
  * Trait to Validate a mySQL Date
  *

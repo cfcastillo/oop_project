@@ -4,8 +4,6 @@ namespace cfiniello\ObjectOrientedDesign;
 require_once("autoload.php");
 require_once(dirname(__DIR__) . "/vendor/autoload.php");
 
-use Deepdivedylan\DataDesign\ValidateDate;
-use Deepdivedylan\DataDesign\ValidateUuid;
 use Ramsey\Uuid\Uuid;
 
 /**
@@ -64,7 +62,9 @@ class Author implements \JsonSerializable {
 	 */
 	public function setAuthorId($newAuthorId) : void {
 		try {
-			$uuid = self::validateUuid($newAuthorId);
+			//TODO: fix reference error.
+			//$uuid = self::validateUuid($newAuthorId);
+			$uuid = $newAuthorId;
 		} catch(\InvalidArgumentException | \RangeException | \Exception | \TypeError $exception) {
 			$exceptionType = get_class($exception);
 			throw(new $exceptionType($exception->getMessage(), 0, $exception));
@@ -156,7 +156,7 @@ class Author implements \JsonSerializable {
 			throw(new \RangeException("email too large"));
 		}
 
-		$this->authorAvatarUrl = $newAuthorEmail;
+		$this->authorEmail = $newAuthorEmail;
 	}
 
 	/**
