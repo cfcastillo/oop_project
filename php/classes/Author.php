@@ -63,7 +63,14 @@ class Author implements \JsonSerializable {
 	 * @throws \TypeError if $newAuthorId is not a uuid
 	 */
 	public function setAuthorId($newAuthorId) : void {
-		return;
+		try {
+			$uuid = self::validateUuid($newAuthorId);
+		} catch(\InvalidArgumentException | \RangeException | \Exception | \TypeError $exception) {
+			$exceptionType = get_class($exception);
+			throw(new $exceptionType($exception->getMessage(), 0, $exception));
+		}
+
+		$this->authorId = $uuid;
 	}
 
 	/**
@@ -80,7 +87,19 @@ class Author implements \JsonSerializable {
 	 * @throws TODO
 	 */
 	public function setAuthorActivationToken($newAuthorActivationToken) : void {
-		return;
+		$newAuthorActivationToken = trim($newAuthorActivationToken);
+		//TODO: verify what filter options we would use for the activation token
+		$newAuthorActivationToken = filter_var($newAuthorActivationToken, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+		if(empty($newAuthorActivationToken) === true) {
+			throw(new \InvalidArgumentException("activation token is empty or insecure"));
+		}
+
+		// verify the token will fit in the database
+		if(strlen($newAuthorActivationToken) > 32) {
+			throw(new \RangeException("activation token too large"));
+		}
+
+		$this->authorActivationToken = $newAuthorActivationToken;
 	}
 
 	/**
@@ -97,7 +116,19 @@ class Author implements \JsonSerializable {
 	 * @throws TODO
 	 */
 	public function setAuthorAvatarUrl($newAuthorAvatarUrl) : void {
-		return;
+		$newAuthorAvatarUrl = trim($newAuthorAvatarUrl);
+		//TODO: verify what filter options we would use for the avatar url
+		$newAuthorAvatarUrl = filter_var($newAuthorAvatarUrl, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+		if(empty($newAuthorAvatarUrl) === true) {
+			throw(new \InvalidArgumentException("avatar url is empty or insecure"));
+		}
+
+		// verify the url will fit in the database
+		if(strlen($newAuthorAvatarUrl) > 255) {
+			throw(new \RangeException("avatar url too large"));
+		}
+
+		$this->authorAvatarUrl = $newAuthorAvatarUrl;
 	}
 
 	/**
@@ -114,7 +145,18 @@ class Author implements \JsonSerializable {
 	 * @throws TODO
 	 */
 	public function setAuthorEmail($newAuthorEmail) : void {
-		return;
+		$newAuthorEmail = trim($newAuthorEmail);
+		$newAuthorEmail = filter_var($newAuthorEmail, FILTER_VALIDATE_EMAIL);
+		if(empty($newAuthorEmail) === true) {
+			throw(new \InvalidArgumentException("email is empty or insecure"));
+		}
+
+		// verify the url will fit in the database
+		if(strlen($newAuthorEmail) > 128) {
+			throw(new \RangeException("email too large"));
+		}
+
+		$this->authorAvatarUrl = $newAuthorEmail;
 	}
 
 	/**
@@ -131,7 +173,19 @@ class Author implements \JsonSerializable {
 	 * @throws TODO
 	 */
 	public function setAuthorHash($newAuthorHash) : void {
-		return;
+		$newAuthorHash = trim($newAuthorHash);
+		//TODO: verify what filter options we would use for the hash
+		$newAuthorHash = filter_var($newAuthorHash, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+		if(empty($newAuthorHash) === true) {
+			throw(new \InvalidArgumentException("hash is empty or insecure"));
+		}
+
+		// verify the hash will fit in the database
+		if(strlen($newAuthorHash) > 97) {
+			throw(new \RangeException("hash is too large"));
+		}
+
+		$this->authorHash = $newAuthorHash;
 	}
 
 	/**
@@ -148,7 +202,19 @@ class Author implements \JsonSerializable {
 	 * @throws TODO
 	 */
 	public function setAuthorUsername($newAuthorUsername) : void {
-		return;
+		$newAuthorUsername = trim($newAuthorUsername);
+		//TODO: verify what filter options we would use for the username
+		$newAuthorUsername = filter_var($newAuthorUsername, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+		if(empty($newAuthorUsername) === true) {
+			throw(new \InvalidArgumentException("username is empty or insecure"));
+		}
+
+		// verify the username will fit in the database
+		if(strlen($newAuthorUsername) > 32) {
+			throw(new \RangeException("username is too large"));
+		}
+
+		$this->authorUsername = $newAuthorUsername;
 	}
 
 	/**
