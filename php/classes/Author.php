@@ -293,8 +293,8 @@ class Author implements \JsonSerializable {
 	 * @throws \PDOException when mySQL related errors occur
 	 * @throws \TypeError when a variable are not the correct data type
 	 **/
-	public static function getTweetByTweetId(\PDO $pdo, $authorId) : ?Author {
-		// sanitize the tweetId before searching
+	public static function getAuthorByAuthorId(\PDO $pdo, $authorId) : ?Author {
+		// sanitize the authorId before searching
 		try {
 			$authorId = self::validateUuid($authorId);
 		} catch(\InvalidArgumentException | \RangeException | \Exception | \TypeError $exception) {
@@ -307,7 +307,7 @@ class Author implements \JsonSerializable {
 						WHERE authorId = :authorId";
 		$statement = $pdo->prepare($query);
 
-		// bind the tweet id to the place holder in the template
+		// bind the author id to the place holder in the template
 		$parameters = ["authorId" => $authorId->getBytes()];
 		$statement->execute($parameters);
 
