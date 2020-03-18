@@ -1,5 +1,5 @@
 <?php
-//require_once("/etc/apache2/capstone-mysql/Secrets.php");
+require_once("/etc/apache2/capstone-mysql/Secrets.php");
 require_once(dirname(__DIR__, 1) . "/classes/Author.php");
 //require_once("uuid.php");
 
@@ -14,5 +14,5 @@ $authorEmail = "theemail@email.net";
 $authorHash = "a_super_secure_hash";
 $authorUsername = "theusername";
 $author = new \cfiniello\ObjectOrientedDesign\Author($authorId, $authorActivationCode, $authorAvatarUrl, $authorEmail, $authorHash, $authorUsername);
-//$author->insert($pdo);
+$author->insert($pdo);
 var_dump($author);
