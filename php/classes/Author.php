@@ -8,7 +8,7 @@ use Ramsey\Uuid\Uuid;
 
 /**
  * Class Author
- * @package cfiniello\ObjectOrientedDesign
+ * @package cfiniello\oop_project
  */
 class Author implements \JsonSerializable {
 	use ValidateDate;
@@ -63,8 +63,8 @@ class Author implements \JsonSerializable {
 	public function setAuthorId($newAuthorId) : void {
 		try {
 			//TODO: fix reference error.
-			//$uuid = self::validateUuid($newAuthorId);
-			$uuid = $newAuthorId;
+			$uuid = self::validateUuid($newAuthorId);
+			//$uuid = $newAuthorId;
 		} catch(\InvalidArgumentException | \RangeException | \Exception | \TypeError $exception) {
 			$exceptionType = get_class($exception);
 			throw(new $exceptionType($exception->getMessage(), 0, $exception));
@@ -252,8 +252,8 @@ class Author implements \JsonSerializable {
 
 		// create query template
 		$query = "UPDATE author 
-						SET authorActivationCode = :authorActivationCode, authorAvatarUrl = :authorAvatarUrl, authorEmail = :authorEmail,
-							authoHash = :authorHash, authorUsername = :authoUsername 
+						SET authorActivationToken = :authorActivationToken, authorAvatarUrl = :authorAvatarUrl, authorEmail = :authorEmail,
+							authorHash = :authorHash, authorUsername = :authorUsername 
 						WHERE authorId = :authorId";
 		$statement = $pdo->prepare($query);
 
@@ -263,6 +263,7 @@ class Author implements \JsonSerializable {
 							"authorEmail" => $this->authorEmail,
 							"authorHash" => $this->authorHash,
 							"authorUsername" => $this->authorUsername];
+
 		$statement->execute($parameters);
 	}
 
@@ -293,7 +294,7 @@ class Author implements \JsonSerializable {
 	 * @throws \PDOException when mySQL related errors occur
 	 * @throws \TypeError when a variable are not the correct data type
 	 **/
-	public static function getAuthorByAuthorId(\PDO $pdo, $authorId) : ?Author {
+	public function getAuthorByAuthorId(\PDO $pdo, $authorId) : ?Author {
 		// sanitize the authorId before searching
 		try {
 			$authorId = self::validateUuid($authorId);
