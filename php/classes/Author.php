@@ -1,5 +1,5 @@
 <?php
-namespace cfiniello\ObjectOrientedDesign;
+namespace cfiniello\oop_project;
 
 require_once("autoload.php");
 require_once(dirname(__DIR__) . "/vendor/autoload.php");
