@@ -3,11 +3,9 @@
 require_once(dirname(__DIR__, 1) . "/classes/Author.php");
 //require_once("uuid.php");
 
-
 // The pdo object has been created for you.
-//$secrets =  new \Secrets("/etc/apache2/capstone-mysql/assessment.ini");
-//$pdo = $secrets->getPdoObject();
-
+$secrets =  new \Secrets("/etc/apache2/capstone-mysql/cohort28/cfiniello.ini");
+$pdo = $secrets->getPdoObject();
 
 $authorId = "b1d2d31bd17e474c9f6ccb9ddbc22793"; //generateUuidV4();
 $authorActivationCode = "the_activation_code";
