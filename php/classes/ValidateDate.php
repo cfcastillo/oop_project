@@ -1,5 +1,5 @@
 <?php
-namespace cfiniello\oop_project;
+namespace CFiniello\ObjectOriented;
 /**
  * Trait to Validate a mySQL Date
  *

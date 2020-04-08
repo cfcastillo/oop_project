@@ -1,5 +1,5 @@
 <?php
-namespace cfiniello\oop_project;
+namespace CFiniello\ObjectOriented;
 
 require_once("autoload.php");
 require_once(dirname(__DIR__) . "/vendor/autoload.php");
@@ -330,8 +330,27 @@ class Author implements \JsonSerializable {
 		return($author);
 	}
 
-	public function getAllAuthors(\PDO $pdo){
-		return something;
+	public function getAllAuthors(\PDO $pdo) : \SPLFixedArray{
+		// create query template
+		$query = "SELECT authorId, authorActivationToken, authorAvatarUrl, authorEmail, authorHash, authorUsername 
+						FROM author";
+		$statement = $pdo->prepare($query);
+		$statement->execute();
+
+		$authors = new \SPLFixedArray($statement->rowCount());
+		$statement->setFetchMode(\PDO::FETCH_ASSOC);
+
+		while (($row = $statement->fetch()) !== false) {
+			try {
+				$author = new Author($row["authorId"], $row["authorActivationToken"], $row["authorAvatarUrl"], $row["authorEmail"], $row["authorHash"], $row["authorUsername"]);
+				$authors[$authors->key()] = $author;
+				$authors->next();
+			} catch(\Exception $exception) {
+				// if the row couldn't be converted, rethrow it
+				throw(new \PDOException($exception->getMessage(), 0, $exception));
+			}
+		}
+		return ($authors);
 	}
 
 	/**
