@@ -24,15 +24,7 @@ class Author implements \JsonSerializable {
 	private $authorHash;
 	private $authorUsername;
 
-	/**
-	 * Author constructor.
-	 * @param $newAuthorId
-	 * @param $newAuthorActivationToken
-	 * @param $newAuthorAvatarUrl
-	 * @param $newAuthorEmail
-	 * @param $newAuthorHash
-	 * @param $newAuthorUsername
-	 */
+
 	public function __construct($newAuthorId, $newAuthorActivationToken, $newAuthorAvatarUrl, $newAuthorEmail, $newAuthorHash, $newAuthorUsername){
 		try{
 			$this->setAuthorId($newAuthorId);
@@ -62,14 +54,13 @@ class Author implements \JsonSerializable {
 	 */
 	public function setAuthorId($newAuthorId) : void {
 		try {
-			//TODO: fix reference error.
 			$uuid = self::validateUuid($newAuthorId);
-			//$uuid = $newAuthorId;
 		} catch(\InvalidArgumentException | \RangeException | \Exception | \TypeError $exception) {
 			$exceptionType = get_class($exception);
 			throw(new $exceptionType($exception->getMessage(), 0, $exception));
 		}
 
+		//pushing the authorid into the state variable.
 		$this->authorId = $uuid;
 	}
 
@@ -84,19 +75,22 @@ class Author implements \JsonSerializable {
 	/**
 	 * mutator method for author activation token
 	 * @param string $newAuthorActivationToken new value of author activation token
-	 * @throws TODO
+	 * @throws \InvalidArgumentException
+	 * @throws \RangeException
 	 */
 	public function setAuthorActivationToken($newAuthorActivationToken) : void {
+		if($newAuthorActivationToken === null) {
+			$this->authorActivationToken = null;
+			return;
+		}
 		$newAuthorActivationToken = trim($newAuthorActivationToken);
-		//TODO: verify what filter options we would use for the activation token
-		$newAuthorActivationToken = filter_var($newAuthorActivationToken, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
-		if(empty($newAuthorActivationToken) === true) {
-			throw(new \InvalidArgumentException("activation token is empty or insecure"));
+		if(ctype_xdigit($newAuthorActivationToken) === false) {
+			throw(new\RangeException("user activation is not valid"));
 		}
 
 		// verify the token will fit in the database
-		if(strlen($newAuthorActivationToken) > 32) {
-			throw(new \RangeException("activation token too large"));
+		if(strlen($newAuthorActivationToken) != 32) {
+			throw(new \RangeException("activation token must be 32 characters long"));
 		}
 
 		$this->authorActivationToken = $newAuthorActivationToken;
@@ -113,7 +107,8 @@ class Author implements \JsonSerializable {
 	/**
 	 * mutator method for author avatar url
 	 * @param string $newAuthorAvatarUrl new value of author avatar url
-	 * @throws TODO
+	 * @throws \InvalidArgumentException
+	 * @throws \RangeException
 	 */
 	public function setAuthorAvatarUrl($newAuthorAvatarUrl) : void {
 		$newAuthorAvatarUrl = trim($newAuthorAvatarUrl);
@@ -142,7 +137,8 @@ class Author implements \JsonSerializable {
 	/**
 	 * mutator method for author email
 	 * @param string $newAuthorEmail new value of author email
-	 * @throws TODO
+	 * @throws \InvalidArgumentException
+	 * @throws \RangeException
 	 */
 	public function setAuthorEmail($newAuthorEmail) : void {
 		$newAuthorEmail = trim($newAuthorEmail);
@@ -170,14 +166,20 @@ class Author implements \JsonSerializable {
 	/**
 	 * mutator method for author hash
 	 * @param string $newAuthorHash new value of author hash
-	 * @throws TODO
+	 * @throws \InvalidArgumentException
+	 * @throws \RangeException
 	 */
 	public function setAuthorHash($newAuthorHash) : void {
+		//enforce that the hash is properly formatted
 		$newAuthorHash = trim($newAuthorHash);
-		//TODO: verify what filter options we would use for the hash
-		$newAuthorHash = filter_var($newAuthorHash, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
 		if(empty($newAuthorHash) === true) {
-			throw(new \InvalidArgumentException("hash is empty or insecure"));
+			throw(new \InvalidArgumentException("author password hash empty or insecure"));
+		}
+
+		//enforce the hash is really an Argon hash
+		$authorHashInfo = password_get_info($newAuthorHash);
+		if($authorHashInfo["algoName"] !== "argon2i") {
+			throw(new \InvalidArgumentException("author hash is not a valid hash"));
 		}
 
 		// verify the hash will fit in the database
@@ -199,11 +201,11 @@ class Author implements \JsonSerializable {
 	/**
 	 * mutator method for author username
 	 * @param string $newAuthorUsername new value of author username
-	 * @throws TODO
+	 * @throws \InvalidArgumentException
+	 * @throws \RangeException
 	 */
 	public function setAuthorUsername($newAuthorUsername) : void {
 		$newAuthorUsername = trim($newAuthorUsername);
-		//TODO: verify what filter options we would use for the username
 		$newAuthorUsername = filter_var($newAuthorUsername, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
 		if(empty($newAuthorUsername) === true) {
 			throw(new \InvalidArgumentException("username is empty or insecure"));
@@ -232,7 +234,7 @@ class Author implements \JsonSerializable {
 		$statement = $pdo->prepare($query);
 
 		// bind the member variables to the place holders in the template
-		$parameters = ["authorId" => $this->authorId->getBytes(),
+		$parameters = ["authorId" => $this->getAuthorId()->getBytes(),
 							"authorActivationToken" => $this->authorActivationToken,
 							"authorAvatarUrl" => $this->authorAvatarUrl,
 							"authorEmail" => $this->authorEmail,
@@ -294,7 +296,7 @@ class Author implements \JsonSerializable {
 	 * @throws \PDOException when mySQL related errors occur
 	 * @throws \TypeError when a variable are not the correct data type
 	 **/
-	public function getAuthorByAuthorId(\PDO $pdo, $authorId) : ?Author {
+	public static function getAuthorByAuthorId(\PDO $pdo, $authorId) : ?Author {
 		// sanitize the authorId before searching
 		try {
 			$authorId = self::validateUuid($authorId);
@@ -326,6 +328,10 @@ class Author implements \JsonSerializable {
 			throw(new \PDOException($exception->getMessage(), 0, $exception));
 		}
 		return($author);
+	}
+
+	public function getAllAuthors(\PDO $pdo){
+		return something;
 	}
 
 	/**
