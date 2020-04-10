@@ -89,25 +89,30 @@ class AuthorTest extends DataDesignTest {
 		//get count of author records in db before we run the test.
 		$numRows = $this->getConnection()->getRowCount("author");
 
-		//insert an author record in the db
-		$authorId = generateUuidV4()->toString();
-		$author = new Author($authorId, $this->VALID_ACTIVATION_TOKEN, $this->VALID_AVATAR_URL,$this->VALID_AUTHOR_EMAIL, $this->VALID_AUTHOR_HASH, $this->VALID_USERNAME);
-		$author->insert($this->getPDO());
+		$rowsInserted = 2;
+		//now insert 5 rows of data
+		for ($i=0; $i<$rowsInserted; $i++){
+			$authorId = generateUuidV4()->toString();
+			$author = new Author($authorId, $this->VALID_ACTIVATION_TOKEN,
+				$this->VALID_AVATAR_URL,
+				$this->VALID_AUTHOR_EMAIL . $i,
+				$this->VALID_AUTHOR_HASH,
+				$this->VALID_USERNAME . $i);
+			$author->insert($this->getPDO());
+		}
 
-		//check count of author records in the db after the insert
 		$numRowsAfterInsert = $this->getConnection()->getRowCount("author");
-		self::assertEquals($numRows + 1, $numRowsAfterInsert);
+		self::assertEquals($numRows + $rowsInserted, $numRowsAfterInsert, "insert checked record count");
 
-		//now delete the record we just inserted
+		//now delete the last record we inserted
 		$author->delete($this->getPDO());
 
-		//try to get the record. it should not exist.
+		//try to get the last record we inserted. it should not exist.
 		$pdoAuthor = Author::getAuthorByAuthorId($this->getPDO(), $author->getAuthorId()->toString());
-		self::assertNull($pdoAuthor);
 
-		//verify the record count has returned to the original count before the record was inserted.
-		self::assertEquals($this->getConnection()->getRowCount("author"), $numRows);
-
+		//validate that only one record was deleted.
+		$numRowsAfterDelete = $this->getConnection()->getRowCount("author");
+		self::assertEquals($numRows + $rowsInserted - 1, $numRowsAfterDelete, "record count after deleting one record");
 
 	}
 
