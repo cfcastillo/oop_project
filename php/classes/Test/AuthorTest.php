@@ -90,7 +90,7 @@ class AuthorTest extends DataDesignTest {
 		$numRows = $this->getConnection()->getRowCount("author");
 
 		$rowsInserted = 2;
-		//now insert 5 rows of data
+		//now insert multiple rows of data
 		for ($i=0; $i<$rowsInserted; $i++){
 			$authorId = generateUuidV4()->toString();
 			$author = new Author($authorId, $this->VALID_ACTIVATION_TOKEN,
@@ -102,7 +102,7 @@ class AuthorTest extends DataDesignTest {
 		}
 
 		$numRowsAfterInsert = $this->getConnection()->getRowCount("author");
-		self::assertEquals($numRows + $rowsInserted, $numRowsAfterInsert, "insert checked record count");
+		self::assertEquals($numRows + $rowsInserted, $numRowsAfterInsert);
 
 		//now delete the last record we inserted
 		$author->delete($this->getPDO());
@@ -112,7 +112,7 @@ class AuthorTest extends DataDesignTest {
 
 		//validate that only one record was deleted.
 		$numRowsAfterDelete = $this->getConnection()->getRowCount("author");
-		self::assertEquals($numRows + $rowsInserted - 1, $numRowsAfterDelete, "record count after deleting one record");
+		self::assertEquals($numRows + $rowsInserted - 1, $numRowsAfterDelete);
 
 	}
 
