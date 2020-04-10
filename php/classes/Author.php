@@ -132,6 +132,7 @@ class Author implements \JsonSerializable {
 	 */
 	public function getAuthorEmail() : string {
 		return ($this->authorEmail);
+		//return "mytest@email.net";
 	}
 
 	/**
@@ -141,6 +142,7 @@ class Author implements \JsonSerializable {
 	 * @throws \RangeException
 	 */
 	public function setAuthorEmail($newAuthorEmail) : void {
+
 		$newAuthorEmail = trim($newAuthorEmail);
 		$newAuthorEmail = filter_var($newAuthorEmail, FILTER_VALIDATE_EMAIL);
 		if(empty($newAuthorEmail) === true) {
@@ -296,7 +298,7 @@ class Author implements \JsonSerializable {
 	 * @throws \PDOException when mySQL related errors occur
 	 * @throws \TypeError when a variable are not the correct data type
 	 **/
-	public static function getAuthorByAuthorId(\PDO $pdo, $authorId) : ?Author {
+	public static function getAuthorByAuthorId(\PDO $pdo, string $authorId) : ?Author {
 		// sanitize the authorId before searching
 		try {
 			$authorId = self::validateUuid($authorId);
